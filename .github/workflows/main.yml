@@ -1,45 +1,38 @@
 name: Build Android APK
 ​on:
 push:
-branches: ["main", "master"]
+branches:
+- main
+- master
 workflow_dispatch:
 ​jobs:
-build-apk:
-name: Build Native Android APK
+build:
 runs-on: ubuntu-latest
 ​steps:
 - name: Checkout Code
 uses: actions/checkout@v4
-​- name: Setup Node.js
+​- name: Setup Node
 uses: actions/setup-node@v4
 with:
 node-version: 20
-​- name: Setup Java JDK
+​- name: Setup Java
 uses: actions/setup-java@v4
 with:
-distribution: 'zulu'
+distribution: temurin
 java-version: 17
-​- name: Setup Android SDK
-uses: android-actions/setup-android@v3
-​- name: Prepare Web Directory
+​- name: Prepare and Build APK
 run: |
 mkdir -p www
 cp index.html www/index.html
-​- name: Install Capacitor CLI
-run: |
 npm init -y
 npm install @capacitor/core @capacitor/cli @capacitor/android
-​- name: Initialize Capacitor Project
-run: |
-npx cap init "3D Tamil Calendar" "com.arulkrish.tamilcalendar3d" --web-dir www
+npx cap init "3D Tamil Calendar" com.arulkrish.tamilcalendar3d --web-dir www
 npx cap add android
 npx cap sync android
-​- name: Build Debug Android APK
-run: |
 cd android
 chmod +x gradlew
-./gradlew assembleDebug --stacktrace
-​- name: Upload Finished APK
+./gradlew assembleDebug
+​- name: Upload APK
 uses: actions/upload-artifact@v4
 with:
 name: Tamil-Calendar-Debug-APK
